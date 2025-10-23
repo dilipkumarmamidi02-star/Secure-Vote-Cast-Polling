@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Secure Polling Demo</title>
+    <style>
+        /* Embedded CSS from styles.css and component styles */
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            background: #f4f6fb;
+            color: #0f172a;
+            margin: 0;
+            padding: 16px;
+        }
+        .container {
+            max-width: 1100px;
+            margin: 16px auto;
+            display: grid;
+            grid-template-columns: 1fr 360px;
+            gap: 16px;
+        }
+        .main {
+            background: white;
+            padding: 16px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .aside {
+            background: white;
+            padding: 16px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        input, button {
+            padding: 8px;
+            margin: 6px 0;
+            border-radius: 6px;
+            border: 1px solid #ccc;
+        }
+        button {
+            cursor: pointer;
+            background: #0b63b7;
+            color: white;
+            border: none;
+        }
+        button:hover {
+            background: #053c66;
+        }
+        .muted {
+            color: #6b7280;
+            font-size: 0.9em;
+        }
+        .chat-container {
+            border: 1px solid #e6eefc;
+            padding: 8px;
+            border-radius: 8px;
+        }
+        .chat-messages {
+            height: 300px;
+            overflow: auto;
+            background: #fbfdff;
+            padding: 6px;
+        }
+        .message {
+            margin: 4px 0;
+        }
+        .message.user {
+            text-align: right;
+        }
+        .message.bot {
+            text-align: left;
+        }
+        .message div {
+            display: inline-block;
+            padding: 8px;
+            border-radius: 8px;
+            max-width: 70%;
+        }
+        .message.user div {
+            background: #0b63b7;
+            color: #fff;
+        }
+        .message.bot div {
+            background: #eef6ff;
+            color: #053c66;
+        }
+        .chat-input {
+            display: flex;
+            gap: 8px;
+            margin-top: 8px;
+        }
+        .ballot {
+            margin-top: 16px;
+        }
+        .evm-ballot {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 10px;
+            margin-top: 16px;
+        }
+        .evm-option {
+            background: #f9f9f9;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            padding: 12px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: bold;
+        }
+        .evm-option:hover {
+            border-color: #0b63b7;
+            background: #eef6ff;
+        }
+        .evm-option.selected {
+            border-color: #0b63b7;
+            background: #d1ecf1;
+            box-shadow: 0 0 10px rgba(11, 99, 183, 0.5);
+        }
+        .symbol {
+            font-size: 1.2em;
+            color: #0b63b7;
+            margin-bottom: 4px;
+        }
+        .party-name {
+            font-size: 0.9em;
+            color: #333;
+        }
+        hr {
+            border: none;
+            border-top: 1px solid #e6eefc;
+            margin: 16px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="main">
+            <h2>Secure Polling Demo</h2>
+            <div id="vote-flow">
+                <h3>Verify & Vote</h3>
+                <input id="voter-id" placeholder="Voter ID (EPIC - 10 characters: at least 3 letters, at most 7 digits)" />
+                <input id="aadhaar" placeholder="Aadhaar (12-digit number)" />
+                <div style="display: flex; gap: 8px;">
+                    <button onclick="verifyVoter()">Verify</button>
+                    <button onclick="resetVote()">Reset</button>
+                </div>
+                <div id="status" class="muted"></div>
+                <div id="ballot" style="display: none;">
+                    <h4>EVM Ballot (Select a Party)</h4>
+                    <p class="muted">As per ECI guidelines, select your party by pressing the corresponding button on the EVM screen. Symbols ensure accessibility.</p>
+                    <div class="evm-ballot">
+                        <div class="evm-option" data-party="BJP" onclick="selectParty('BJP')">
+                            <div class="symbol">🪷 Lotus</div>
+                            <div class="party-name">Bharatiya Janata Party</div>
+                        </div>
+                        <div class="evm-option" data-party="INC" onclick="selectParty('INC')">
+                            <div class="symbol">✋ Hand</div>
+                            <div class="party-name">Indian National Congress</div>
+                        </div>
+                        <div class="evm-option" data-party="CPM" onclick="selectParty('CPM')">
+                            <div class="symbol">🔨⚒️ Hammer, Sickle and Star</div>
+                            <div class="party-name">Communist Party of India (Marxist)</div>
+                        </div>
+                        <div class="evm-option" data-party="CPI" onclick="selectParty('CPI')">
+                            <div class="symbol">🌽 Ears of Corn and Sickle</div>
+                            <div class="party-name">Communist Party of India</div>
+                        </div>
+                        <div class="evm-option" data-party="TMC" onclick="selectParty('TMC')">
+                            <div class="symbol">🌱 Grass</div>
+                            <div class="party-name">All India Trinamool Congress</div>
+                        </div>
+                        <div class="evm-option" data-party="BSP" onclick="selectParty('BSP')">
+                            <div class="symbol">🐘 Elephant</div>
+                            <div class="party-name">Bahujan Samaj Party</div>
+                        </div>
+                        <div class="evm-option" data-party="NCP" onclick="selectParty('NCP')">
+                            <div class="symbol">⏰ Clock</div>
+                            <div class="party-name">Nationalist Congress Party</div>
+                        </div>
+                        <div class="evm-option" data-party="RJD" onclick="selectParty('RJD')">
+                            <div class="symbol">🏮 Lantern</div>
+                            <div class="party-name">Rashtriya Janata Dal</div>
+                        </div>
+                        <div class="evm-option" data-party="JDU" onclick="selectParty('JDU')">
+                            <div class="symbol">➡️ Arrow</div>
+                            <div class="party-name">Janata Dal (United)</div>
+                        </div>
+                        <div class="evm-option" data-party="SP" onclick="selectParty('SP')">
+                            <div class="symbol">🚲 Bicycle</div>
+                            <div class="party-name">Samajwadi Party</div>
+                        </div>
+                    </div>
+                    <button onclick="castVote()">Cast Vote</button>
+                </div>
+            </div>
+            <hr />
+            <h4>Upload proof (optional)</h4>
+            <div id="file-upload">
+                <input id="upload-voter-id" placeholder="Optional voterId" />
+                <input id="file-input" type="file" />
+                <button onclick="uploadFile()">Upload</button>
+            </div>
+        </div>
+        <aside class="aside">
+            <div class="chat-container">
+                <div id="chat-messages" class="chat-messages">
+                    <div class="message bot"><div>Hello — Poll Assistant. I operate strictly in compliance with ECI rules and regulations to ensure free, fair, and transparent elections. Remember, your vote is your power—exercise it responsibly!</div></div>
+                </div>
+                <div class="chat-input">
+                    <input id="chat-text" placeholder="Ask Poll Assistant..." />
+                    <button onclick="sendChat()">Send</button>
+                </div>
+            </div>
+        </aside>
+    </div>
+
+    <script>
+        // Simulated state (in React, this would be useState)
+        let voterEligible = false;
+        let chatMessages = [{ from: 'bot', text: 'Hello — Poll Assistant. I operate strictly in compliance with ECI rules and regulations to ensure free, fair, and transparent elections. Remember, your vote is your power—exercise it responsibly!' }];
+        let selectedParty = null;
+        let castVotes = JSON.parse(localStorage.getItem('castVotes')) || [];
+
+        // Vote Flow Functions (from VoteFlow.js)
+        function verifyVoter() {
+            const voterId = document.getElementById('voter-id').value.trim();
+            const aadhaar = document.getElementById('aadhaar').value.trim();
+            const statusEl = document.getElementById('status');
+            const ballotEl = document.getElementById('ballot');
+            statusEl.textContent = 'Verifying...';
+
+            // Validate Aadhaar: Must be exactly 12 digits
+            const aadhaarRegex = /^\d{12}$/;
+            if (!aadhaarRegex.test(aadhaar)) {
+                statusEl.textContent = 'Failed: Aadhaar must be exactly 12 digits.';
+                voterEligible = false;
+                ballotEl.style.display = 'none';
+                return;
+            }
+
+            // Validate Voter ID (EPIC): Must be exactly 10 characters, alphanumeric, at least 3 alphabets, at most 7 numbers, no special characters
+            const voterIdRegex = /^[A-Za-z0-9]{10}$/;
+            if (!voterIdRegex.test(voterId)) {
+                statusEl.textContent = 'Failed: Voter ID (EPIC) must be exactly 10 alphanumeric characters.';
+                voterEligible = false;
+                ballotEl.style.display = 'none';
+                return;
+            }
+            const letters = (voterId.match(/[A-Za-z]/g) || []).length;
+            const digits = (voterId.match(/\d/g) || []).length;
+            if (letters < 3 || digits > 7) {
+                statusEl.textContent = 'Failed: Voter ID (EPIC) must have at least 3 letters and at most 7 digits.';
+                voterEligible = false;
+                ballotEl.style.display = 'none';
+                return;
+            }
+
+            // Simulate API call (replace with fetch('/api/voter/verify', { method: 'POST', body: JSON.stringify({ voterId, aadhaar }) }))
+            setTimeout(() => {
+                // Assuming verification succeeds if formats are correct (in real app, check against database)
+                statusEl.textContent = 'Verified';
+                voterEligible = true;
+                ballotEl.style.display = 'block';
+            }, 1000);
+        }
+
+        function resetVote() {
+            document.getElementById('voter-id').value = '';
+            document.getElementById('aadhaar').value = '';
+            voterEligible = false;
+            document.getElementById('status').textContent = '';
+            document.getElementById('ballot').style.display = 'none';
+            selectedParty = null;
+            // Reset selection
+            document.querySelectorAll('.evm-option').forEach(opt => opt.classList.remove('selected'));
+        }
+
+        function selectParty(party) {
+            selectedParty = party;
+            // Remove selected class from all
+            document.querySelectorAll('.evm-option').forEach(opt => opt.classList.remove('selected'));
+            // Add to clicked one
+            document.querySelector(`.evm-option[data-party="${party}"]`).classList.add('selected');
+        }
+
+        function castVote() {
+            if (!selectedParty) {
+                alert('Select a party by clicking on the EVM option');
+                return;
+            }
+            const voterId = document.getElementById('voter-id').value.trim();
+            const aadhaar = document.getElementById('aadhaar').value.trim();
+            // Check if vote already cast with this Voter ID or Aadhaar
+            if (castVotes.some(v => v.voterId === voterId || v.aadhaar === aadhaar)) {
+                document.getElementById('status').textContent = 'Invalid: Vote already cast with this Voter ID or Aadhaar.';
+                return;
+            }
+            document.getElementById('status').textContent = 'Casting...';
+            // Simulate API call
+            setTimeout(() => {
+                document.getElementById('status').textContent = 'Voted: Confirmation-' + Math.random().toString(36).substr(2, 9).toUpperCase();
+                // Add to cast votes
+                castVotes.push({ voterId, aadhaar });
+                localStorage.setItem('castVotes', JSON.stringify(castVotes));
+            }, 1000);
+        }
+
+        // File Upload Functions (from FileUpload.js)
+        function uploadFile() {
+            const file = document.getElementById('file-input').files[0];
+            const voterId = document.getElementById('upload-voter-id').value;
+            if (!file) {
+                alert('Choose file');
+                return;
+            }
+            alert('Uploaded: Simulated Drive ID - ' + Math.random().toString(36).substr(2, 9));
+            // Simulate API call: fetch('/api/file/upload', { method: 'POST', body: formData })
+        }
+
+        // Chat Functions (from Chat.js)
+        function sendChat() {
+            const text = document.getElementById('chat-text').value.trim();
+            if (!text) return;
+            chatMessages.push({ from: 'user', text });
+            updateChat();
+            document.getElementById('chat-text').value = '';
+            // Simulate bot response (replace with fetch('/api/chatbot', { method: 'POST', body: JSON.stringify({ message: text }) }))
+            setTimeout(() => {
+                const botReply = getBotReply(text);
+                chatMessages.push({ from: 'bot', text: botReply });
+                updateChat();
+            }, 500);
+        }
+
+        function updateChat() {
+            const messagesEl = document.getElementById('chat-messages');
+            messagesEl.innerHTML = chatMessages.map(m => 
+                `<div class="message ${m.from}"><div>${m.text}</div></div>`
+            ).join('');
+            messagesEl.scrollTop = messagesEl.scrollHeight;
+        }
+
+        function getBotReply(message) {
+            const s = message.toLowerCase();
+            if (s.includes('document') || s.includes('aadhaar') || s.includes('proof') || s.includes('id')) {
+                return 'As per ECI rules, bring your Voter ID (EPIC - alphanumeric) to the polling station. Aadhaar (12-digit) is optional for voting but mandatory for verification in this demo. Ensure documents are valid and not expired. Awareness: Carry originals; photocopies may not be accepted.';
+            }
+            if (s.includes('how to vote') || s.includes('vote') || s.includes('process')) {
+                return 'Per ECI guidelines: Arrive at your polling station with ID, get your finger marked with indelible ink, select your party by symbol on the ballot/EVM, and cast your vote anonymously. One vote per person. Awareness: Voting is a right and duty—participate to shape democracy!';
+            }
+            if (s.includes('eligible') || s.includes('age') || s.includes('register')) {
+                return 'ECI rules: You must be 18+ years old, a citizen of India, and registered on the electoral roll. If not registered, apply online via the ECI website. Awareness: Voter registration ensures your voice is heard in elections.';
+            }
+            if (s.includes('party') || s.includes('symbol') || s.includes('ballot')) {
+                return 'The ballot lists national parties with their reserved symbols (e.g., BJP - Lotus, INC - Hand) as per ECI allocations. Symbols aid accessibility for all voters, including those who cannot read. Awareness: Choose wisely based on manifestos and track records.';
+            }
+            if (s.includes('campaign') || s.includes('polling station') || s.includes('code of conduct')) {
+                return 'ECI\'s Model Code of Conduct prohibits campaigning within 100 meters of polling stations, inducements, or violence. Maintain peace. Awareness: Report violations to authorities for fair elections.';
+            }
+            if (s.includes('secrecy') || s.includes('anonymous') || s.includes('confidential')) {
+                return 'ECI ensures voter secrecy; your vote is confidential and cannot be disclosed or coerced. Awareness: No one can force you to reveal your choice—protect your democratic right!';
+            }
+            if (s.includes('eci') || s.includes('rules') || s.includes('regulations') || s.includes('election')) {
+                return 'I strictly follow ECI rules for free, fair, and transparent elections. Key principles: Universal adult suffrage, secret ballot, and no discrimination. Awareness: Stay informed; check ECI website for updates and debunk fake news.';
+            }
+            if (s.includes('help') || s.includes('what can you do') || s.includes('awareness')) {
+                return 'I provide ECI-compliant guidance on voting, eligibility, documents, symbols, and election awareness. Awareness tip: Voting empowers change—encourage others to participate responsibly!';
+            }
+            if (s.includes('irregularities') || s.includes('complaint') || s.includes('report')) {
+                return 'If you witness irregularities like booth capturing or fake votes, report immediately to polling officers or ECI helpline. Awareness: Your vigilance ensures election integrity.';
+            }
+            if (s.includes('importance') || s.includes('why vote')) {
+                return 'Voting is crucial for democracy as per ECI. It elects representatives who govern. Awareness: Abstaining weakens your influence—vote to uphold rights and development!';
+            }
+            return 'I can assist with ECI rules, voting process, eligibility, party symbols, and voter awareness. Ask about documents, elections, or how to stay informed!';
+        }
+    </script>
+</body>
+</html>
