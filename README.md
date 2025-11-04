@@ -1,6 +1,9 @@
 secure-polling-system-project
+
 Secure Polling System - ECI Compliant
+
 🏛️ Project Information
+
 Institution: Gokaraju Rangaraju Institute of Engineering and Technology (GRIET)
 
 Department: Computer Science and Engineering (CSM)
@@ -34,34 +37,41 @@ This project is a fully functional, secure electronic polling system designed in
 ✅ Voter assistance - Interactive chatbot providing ECI-compliant voting guidance
 
 🎯 Key Features
+
 1. Voter Verification System
 Validates 10-character alphanumeric Voter ID (EPIC)
 Verifies 12-digit Aadhaar number
 Implements strict duplicate detection
 Ensures at least 3 letters and at most 7 digits in Voter ID
-2. Electronic Voting Machine (EVM) Interface
+
+3. Electronic Voting Machine (EVM) Interface
 Visual representation of 10 major Indian political parties
 Party symbols for accessibility
 Clear selection feedback
 Vote confirmation with unique confirmation ID
-3. Secure Database Management
+
+5. Secure Database Management
 Persistent storage using browser's storage API
 Tracks all voter IDs and Aadhaar numbers
 Records valid votes, invalid attempts, and party-wise counts
 Protection against data loss
-4. Admin Control Panel
-Username: ECIpolling
-Password: ECI2025
-View comprehensive voting statistics
+
+7. Admin Control Panel
+****Username: ECIpolling
+****Password: ECI2025
+
+9. View comprehensive voting statistics
 Database reset capability (with double confirmation)
 Real-time monitoring of all voting activities
-5. Real-Time Vote Statistics
+
+11. Real-Time Vote Statistics
 Valid votes counter
 Invalid attempts tracker
 Total attempts monitor
 Party-wise vote distribution
 Auto-redirect countdown after vote casting
-6. Interactive Poll Assistant Chatbot
+
+13. Interactive Poll Assistant Chatbot
 Answers questions about voting procedures
 Explains ECI rules and guidelines
 Provides information on eligibility criteria
@@ -126,12 +136,14 @@ Secure confirmation ID generation
 🗳️ Voting Logic
 Verification Process:
 1. User enters Voter ID and Aadhaar
-2. System validates format:
+   
+3. System validates format:
    - Voter ID: 10 chars, min 3 letters, max 7 digits
    - Aadhaar: exactly 12 digits
-3. System checks database for duplicates
-4. If valid → proceed to ballot
-5. If invalid → display error message
+   - 
+4. System checks database for duplicates
+5. If valid → proceed to ballot
+6. If invalid → display error message
 Vote Casting Process:
 1. Voter selects party on EVM ballot
 2. System verifies selection
