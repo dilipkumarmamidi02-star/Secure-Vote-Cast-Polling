@@ -8,12 +8,19 @@ Department: Computer Science and Engineering (CSM)
 Group: Elite Stars Group
 
 👥 Team Members
+
 Mani Vignesh
+
 Anjaneya Reddy
+
 Preetham Kumar
+
 Prakash
+
 Dilip Kumar
+
 📋 Project Summary
+
 This project is a fully functional, secure electronic polling system designed in compliance with Election Commission of India (ECI) guidelines. The system implements robust security measures to ensure:
 
 ✅ One vote per citizen - Prevents duplicate voting using Voter ID and Aadhaar verification
