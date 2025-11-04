@@ -206,8 +206,8 @@ This system adheres to Election Commission of India guidelines:
 🔧 Installation
 Clone the Repository
 
-git clone https://github.com/dilipkumarmamidi02-star/secure-polling-system-griet.git
-cd secure-polling-system-griet
+git clone https://github.com/dilipkumarmamidi02-star/Secure-Vote-Cast-Polling.git
+cd secure-vote-cast-polling
 Open the Application
 
 Simply open secure_voting_system.html in any modern web browser
