@@ -22,6 +22,8 @@ Prakash
 
 Dilip Kumar
 
+Vamshi
+
 📋 Project Summary
 
 This project is a fully functional, secure electronic polling system designed in compliance with Election Commission of India (ECI) guidelines. The system implements robust security measures to ensure:
@@ -57,8 +59,8 @@ Records valid votes, invalid attempts, and party-wise counts
 Protection against data loss
 
 7. Admin Control Panel
-****Username: ECIpolling
-****Password: ECI2025
+****Username: ECI@polling
+****Password: ECI@2025
 
 9. View comprehensive voting statistics
 Database reset capability (with double confirmation)
@@ -101,8 +103,8 @@ For Administrators:
 Access Admin Panel
 
 Click "Admin Panel" button (top-right corner)
-Username: ECIpolling
-Password: ECI2025
+Username: ECI@polling
+Password: ECI@2025
 View Statistics
 
 Total votes cast
