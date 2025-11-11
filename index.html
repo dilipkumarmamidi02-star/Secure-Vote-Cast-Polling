@@ -4,7 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Secure Polling System - ECI Compliant</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
+        /* --- HIGH-LEVEL DESIGN TEMPLATE OVERHAUL (PURPLE/BLUE BASE) --- */
         * {
             margin: 0;
             padding: 0;
@@ -13,9 +15,11 @@
         
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            /* Base Gradient */
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: #1a202c;
             min-height: 100vh;
+            overflow-y: auto; 
             padding: 20px;
         }
         
@@ -67,9 +71,11 @@
             bottom: 0;
             background: rgba(0, 0, 0, 0.85);
             z-index: 3000;
-            align-items: center;
+            align-items: flex-start; 
             justify-content: center;
             backdrop-filter: blur(5px);
+            overflow-y: auto; 
+            padding: 20px 0;
         }
         
         .admin-modal.active {
@@ -84,6 +90,7 @@
             width: 90%;
             box-shadow: 0 20px 60px rgba(0,0,0,0.3);
             animation: slideIn 0.3s ease-out;
+            margin: auto; 
         }
         
         @keyframes slideIn {
@@ -175,7 +182,16 @@
         }
         
         .admin-dashboard-extended {
-            max-width: 800px !important;
+            /* Increased width for graph */
+            max-width: 800px !important; 
+        }
+
+        /* --- NEW CHART CONTAINER STYLE --- */
+        .chart-container {
+            padding: 15px; 
+            background: #f7fafc; 
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
         }
         
         .db-records-section {
@@ -209,214 +225,16 @@
             gap: 10px;
             margin-top: 20px;
         }
+
+        .action-buttons.records-panel {
+            grid-template-columns: 1fr;
+        }
         
         .action-buttons button {
             padding: 12px;
         }
         
-        .statistics-page {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            z-index: 1000;
-            overflow-y: auto;
-            padding: 40px 20px;
-            animation: fadeIn 0.5s ease-in;
-        }
-        
-        .statistics-page.active {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        
-        .statistics-container {
-            max-width: 700px;
-            width: 100%;
-        }
-        
-        .statistics-header {
-            text-align: center;
-            color: white;
-            margin-bottom: 40px;
-        }
-        
-        .statistics-header h2 {
-            font-size: 2.5em;
-            margin-bottom: 15px;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
-        }
-        
-        .statistics-header p {
-            font-size: 1.2em;
-            opacity: 0.95;
-        }
-        
-        .statistics-card {
-            background: white;
-            padding: 40px;
-            border-radius: 20px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-            animation: scaleIn 0.5s ease-out;
-        }
-        
-        .stat-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 25px;
-            margin: 20px 0;
-            border-radius: 12px;
-            transition: all 0.3s;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-        }
-        
-        .stat-item:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 20px rgba(0,0,0,0.15);
-        }
-        
-        .stat-label {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            font-size: 1.3em;
-            font-weight: 600;
-        }
-        
-        .stat-icon {
-            font-size: 2.5em;
-            filter: drop-shadow(2px 2px 4px rgba(0,0,0,0.1));
-        }
-        
-        .stat-value {
-            font-size: 3em;
-            font-weight: bold;
-            padding: 10px 25px;
-            border-radius: 12px;
-        }
-        
-        .stat-item.valid {
-            background: linear-gradient(135deg, #c6f6d5 0%, #9ae6b4 100%);
-        }
-        
-        .stat-item.valid .stat-label {
-            color: #22543d;
-        }
-        
-        .stat-item.valid .stat-value {
-            color: #22543d;
-            background: rgba(255, 255, 255, 0.7);
-        }
-        
-        .stat-item.invalid {
-            background: linear-gradient(135deg, #fed7d7 0%, #fc8181 100%);
-        }
-        
-        .stat-item.invalid .stat-label {
-            color: #742a2a;
-        }
-        
-        .stat-item.invalid .stat-value {
-            color: #742a2a;
-            background: rgba(255, 255, 255, 0.7);
-        }
-        
-        .stat-item.total {
-            background: linear-gradient(135deg, #bee3f8 0%, #90cdf4 100%);
-        }
-        
-        .stat-item.total .stat-label {
-            color: #2c5282;
-        }
-        
-        .stat-item.total .stat-value {
-            color: #2c5282;
-            background: rgba(255, 255, 255, 0.7);
-        }
-        
-        .statistics-countdown {
-            text-align: center;
-            margin-top: 30px;
-            padding: 20px;
-            background: rgba(255, 255, 255, 0.2);
-            border-radius: 12px;
-            color: white;
-            font-size: 1.2em;
-            font-weight: 600;
-        }
-        
-        @keyframes scaleIn {
-            from {
-                opacity: 0;
-                transform: scale(0.9);
-            }
-            to {
-                opacity: 1;
-                transform: scale(1);
-            }
-        }
-        
-        .party-results {
-            margin-top: 30px;
-            padding-top: 30px;
-            border-top: 3px solid rgba(255, 255, 255, 0.3);
-        }
-        
-        .party-results h3 {
-            color: white;
-            text-align: center;
-            font-size: 1.8em;
-            margin-bottom: 25px;
-        }
-        
-        .party-result-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 15px 20px;
-            margin: 12px 0;
-            background: white;
-            border-radius: 10px;
-            transition: all 0.3s;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-        }
-        
-        .party-result-item:hover {
-            transform: translateX(5px);
-            box-shadow: 0 6px 16px rgba(0,0,0,0.15);
-        }
-        
-        .party-result-info {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-        
-        .party-result-symbol {
-            font-size: 2em;
-            filter: drop-shadow(2px 2px 4px rgba(0,0,0,0.1));
-        }
-        
-        .party-result-name {
-            font-weight: 600;
-            color: #2d3748;
-            font-size: 1.1em;
-        }
-        
-        .party-result-votes {
-            font-size: 2em;
-            font-weight: bold;
-            color: #667eea;
-            padding: 5px 20px;
-            background: linear-gradient(135deg, #edf2f7 0%, #e2e8f0 100%);
-            border-radius: 8px;
-        }
-        
+        /* --- MAIN PAGE & CARD STYLES --- */
         .container {
             max-width: 1200px;
             margin: 0 auto;
@@ -559,7 +377,8 @@
             background: #bee3f8;
             color: #2c5282;
         }
-        
+
+        /* --- BALLOT PAGE (EVM) STYLES --- */
         .ballot-page {
             display: none;
             position: fixed;
@@ -657,26 +476,10 @@
             overflow: hidden;
         }
         
-        .evm-option::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
-            opacity: 0;
-            transition: opacity 0.3s;
-        }
-        
         .evm-option:hover {
             transform: translateY(-5px);
             border-color: #667eea;
             box-shadow: 0 10px 30px rgba(102, 126, 234, 0.2);
-        }
-        
-        .evm-option:hover::before {
-            opacity: 1;
         }
         
         .evm-option.selected {
@@ -720,7 +523,99 @@
             font-weight: bold;
             color: #4a5568;
         }
+
+        /* --- STATISTICS PAGE STYLES --- */
+        .statistics-page {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            z-index: 1000;
+            overflow-y: auto;
+            padding: 40px 20px;
+            animation: fadeIn 0.5s ease-in;
+        }
         
+        .statistics-page.active {
+            display: block;
+        }
+        
+        .statistics-container {
+            max-width: 700px;
+            width: 100%;
+            margin: 0 auto; 
+        }
+        
+        .statistics-header {
+            text-align: center;
+            color: white;
+            margin-bottom: 40px;
+        }
+        
+        .statistics-header h2 {
+            font-size: 2.5em;
+            margin-bottom: 15px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        .statistics-card {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        
+        .stat-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 25px;
+            margin: 20px 0;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        
+        .stat-item.valid { background: linear-gradient(135deg, #c6f6d5 0%, #9ae6b4 100%); }
+        .stat-item.invalid { background: linear-gradient(135deg, #fed7d7 0%, #fc8181 100%); }
+        .stat-item.total { background: linear-gradient(135deg, #bee3f8 0%, #90cdf4 100%); }
+        
+        .party-results {
+            margin-top: 30px;
+            padding-top: 30px;
+            border-top: 3px solid rgba(255, 255, 255, 0.3);
+        }
+        
+        .party-results h3 {
+            color: #2d3748;
+            text-align: center;
+            font-size: 1.8em;
+            margin-bottom: 25px;
+        }
+        
+        .party-result-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 20px;
+            margin: 12px 0;
+            background: #f7fafc;
+            border-radius: 10px;
+            border-left: 5px solid #667eea;
+        }
+        
+        .party-result-votes {
+            font-size: 2em;
+            font-weight: bold;
+            color: #667eea;
+            padding: 5px 20px;
+            background: linear-gradient(135deg, #edf2f7 0%, #e2e8f0 100%);
+            border-radius: 8px;
+        }
+
+        /* --- CHAT STYLES --- */
         .chat-container {
             background: white;
             border-radius: 16px;
@@ -747,7 +642,6 @@
         
         .message {
             margin-bottom: 15px;
-            animation: fadeIn 0.3s;
         }
         
         .message-content {
@@ -755,12 +649,9 @@
             padding: 12px 16px;
             border-radius: 12px;
             max-width: 85%;
-            line-height: 1.5;
         }
         
-        .message.user {
-            text-align: right;
-        }
+        .message.user { text-align: right; }
         
         .message.user .message-content {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -781,42 +672,6 @@
             border-top: 1px solid #e2e8f0;
             display: flex;
             gap: 10px;
-        }
-        
-        .chat-input-container input {
-            flex: 1;
-            margin: 0;
-        }
-        
-        .chat-input-container button {
-            flex: 0 0 auto;
-            padding: 12px 20px;
-        }
-        
-        .divider {
-            height: 1px;
-            background: linear-gradient(90deg, transparent, #e2e8f0, transparent);
-            margin: 30px 0;
-        }
-        
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-            }
-            to {
-                opacity: 1;
-            }
-        }
-        
-        @keyframes slideUp {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
         }
     </style>
 </head>
@@ -842,9 +697,9 @@
         </div>
     </div>
 
-    <div id="admin-dashboard" class="admin-modal">
+    <div id="admin-dashboard-page1" class="admin-modal">
         <div class="admin-content admin-dashboard-extended">
-            <h2>📊 Admin Dashboard - Database Control</h2>
+            <h2>📊 Admin Dashboard - Voting Statistics</h2>
             
             <div class="admin-stats">
                 <h3>📈 Current Database Statistics</h3>
@@ -870,25 +725,64 @@
                 </div>
             </div>
 
+            <div style="margin-top: 25px; margin-bottom: 20px;">
+                <h3 style="color: #667eea; margin-bottom: 15px;">🗳️ Party Vote Distribution Graph</h3>
+                <div class="chart-container">
+                    <canvas id="vote-chart"></canvas>
+                </div>
+            </div>
+
+            <div class="action-buttons" style="grid-template-columns: 1fr 1fr;">
+                <button class="btn-primary" style="grid-column: 1 / span 2;" onclick="openRecordsLogin()">🔒 Voter & Aadhaar Records</button>
+                <button class="btn-secondary" onclick="closeAdminDashboard()">Close</button>
+                <button class="btn-warning" onclick="refreshAdminDashboard(false)">🔄 Refresh Stats</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="admin-records-login-modal" class="admin-modal">
+        <div class="admin-content">
+            <h2>🔐 Secure Records Access</h2>
+            <p style="text-align: center; margin-bottom: 20px; color: #4a5568;">Requires Level 2 Authorization for Sensitive Data</p>
+            <div class="admin-input-group">
+                <label>Username</label>
+                <input type="text" id="records-username" placeholder="Enter records username">
+            </div>
+            <div class="admin-input-group">
+                <label>Password</label>
+                <input type="password" id="records-password" placeholder="Enter records password" onkeypress="if(event.key==='Enter') recordsLogin()">
+            </div>
+            <div id="records-status"></div>
+            <div class="admin-actions">
+                <button class="btn-secondary" onclick="document.getElementById('admin-records-login-modal').classList.remove('active')">Cancel</button>
+                <button class="btn-primary" onclick="recordsLogin()">Login</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="admin-records-page2" class="admin-modal">
+        <div class="admin-content admin-dashboard-extended">
+            <h2>🔒 Secure Records Panel - Voter & Aadhaar</h2>
+            
             <div class="db-records-section">
                 <h4>📋 Stored Voter IDs</h4>
                 <div id="voter-ids-list"></div>
             </div>
 
             <div class="db-records-section">
-                <h4>📋 Stored Aadhaar Numbers</h4>
+                <h4>📋 Stored Aadhaar Numbers (Masked)</h4>
                 <div id="aadhaar-list"></div>
             </div>
             
-            <div class="action-buttons">
-                <button class="btn-secondary" onclick="closeAdminDashboard()">Close</button>
-                <button class="btn-warning" onclick="refreshAdminDashboard()">🔄 Refresh Data</button>
+            <div class="action-buttons" style="grid-template-columns: 1fr 1fr;">
+                <button class="btn-warning" onclick="refreshAdminDashboard(true)">🔄 Refresh Data</button>
                 <button class="btn-success" onclick="exportDatabaseData()">💾 Export Data</button>
-                <button class="btn-danger" onclick="confirmDatabaseReset()">🗑️ Reset Database</button>
+                <button class="btn-danger" style="grid-column: 1 / span 2;" onclick="confirmDatabaseReset()">🗑️ Reset Database</button>
+                <button class="btn-secondary" style="grid-column: 1 / span 2;" onclick="closeRecordsPage2()">← Back to Dashboard</button>
             </div>
         </div>
     </div>
-
+    
     <div id="main-page">
         <div class="header">
             <h1>🗳️ Secure Polling Demo</h1>
@@ -1066,7 +960,7 @@
                 </div>
                 
                 <div class="party-results">
-                    <h3>🗳️ Party-wise Vote Count</h3>
+                    <h3 style="color: #667eea;">🗳️ Party-wise Vote Count</h3>
                     <div id="party-results-container"></div>
                 </div>
                 
@@ -1087,6 +981,42 @@
             PARTY_VOTES: 'voting_db_parties'
         };
         
+        // Global Variables
+        let usedVoterIds = [];
+        let usedAadhaarNums = [];
+        let voterEligible = false;
+        let selectedParty = null;
+        let castVotes = [];
+        let validVotes = 0;
+        let invalidVotes = 0;
+        let totalAttempts = 0;
+        let partyVotes = {
+            'BJP': 0, 'INC': 0, 'AAP': 0, 'CPM': 0, 'CPI': 0,
+            'TMC': 0, 'BSP': 0, 'NCP': 0, 'SS': 0, 'SP': 0
+        };
+        
+        let partyInfo = {
+            'BJP': { symbol: '🪷', name: 'Bharatiya Janata Party' },
+            'INC': { symbol: '✋', name: 'Indian National Congress' },
+            'AAP': { symbol: '🧹', name: 'Aam Aadmi Party' },
+            'CPM': { symbol: '☭', name: 'Communist Party (Marxist)' },
+            'CPI': { symbol: '🌾', name: 'Communist Party of India' },
+            'TMC': { symbol: '🌷🌿', name: 'All India Trinamool Congress' },
+            'BSP': { symbol: '🐘', name: 'Bahujan Samaj Party' },
+            'NCP': { symbol: '🕒', name: 'Nationalist Congress Party' },
+            'SS': { symbol: '🏹', name: 'Shiv Sena' },
+            'SP': { symbol: '🚲', name: 'Samajwadi Party' }
+        };
+
+        let currentVoterData = { voterId: '', aadhaar: '' };
+        let countdownTimer = null;
+        let chatMessages = [{ 
+            from: 'bot', 
+            text: 'Hello! I\'m the Poll Assistant. I operate strictly in compliance with ECI rules to ensure free, fair, and transparent elections. Your vote is your power—exercise it responsibly! Ask me anything about the voting process.' 
+        }];
+
+        let voteChartInstance = null; 
+
         // Database Functions
         function initDatabase() {
             try {
@@ -1175,45 +1105,69 @@
                 console.error('Database reset error:', error);
             }
         }
-        // --- END FIX ---
-
-        // Global Variables
-        let usedVoterIds = [];
-        let usedAadhaarNums = [];
-        let voterEligible = false;
-        let selectedParty = null;
-        let castVotes = [];
-        let validVotes = 0;
-        let invalidVotes = 0;
-        let totalAttempts = 0;
-        let partyVotes = {
-            'BJP': 0, 'INC': 0, 'AAP': 0, 'CPM': 0, 'CPI': 0,
-            'TMC': 0, 'BSP': 0, 'NCP': 0, 'SS': 0, 'SP': 0
-        };
         
-        let partyInfo = {
-            'BJP': { symbol: '🪷', name: 'Bharatiya Janata Party' },         // Lotus
-            'INC': { symbol: '✋', name: 'Indian National Congress' },       // Hand
-            'AAP': { symbol: '🧹', name: 'Aam Aadmi Party' },                // Broom
-            'CPM': { symbol: '☭', name: 'Communist Party (Marxist)' },      // Hammer, Sickle and Star
-            'CPI': { symbol: '🌾', name: 'Communist Party of India' },       // Ears of Corn and Sickle
-            'TMC': { symbol: '🌷🌿', name: 'All India Trinamool Congress' }, // Flowers & Grass
-            'BSP': { symbol: '🐘', name: 'Bahujan Samaj Party' },            // Elephant
-            'NCP': { symbol: '🕒', name: 'Nationalist Congress Party' },     // Clock
-            'SS': { symbol: '🏹', name: 'Shiv Sena' },                      // Bow and Arrow
-            'SP': { symbol: '🚲', name: 'Samajwadi Party' }                  // Bicycle
-        };
+        function renderVoteGraph() {
+            const ctx = document.getElementById('vote-chart');
+            
+            if (voteChartInstance) {
+                voteChartInstance.destroy();
+            }
 
-        let currentVoterData = { voterId: '', aadhaar: '' };
-        let countdownTimer = null;
-        let chatMessages = [{ 
-            from: 'bot', 
-            text: 'Hello! I\'m the Poll Assistant. I operate strictly in compliance with ECI rules to ensure free, fair, and transparent elections. Your vote is your power—exercise it responsibly! Ask me anything about the voting process.' 
-        }];
+            const labels = Object.keys(partyInfo).map(code => `${partyInfo[code].name} (${code})`);
+            const dataValues = Object.keys(partyInfo).map(code => partyVotes[code] || 0);
 
-        // Admin Functions
+            const backgroundColors = [
+                '#667eea', '#764ba2', '#9f7aea', '#f6ad55', '#f56565', 
+                '#4299e1', '#48bb78', '#ecc94b', '#ed8936', '#a0aec0'
+            ];
+
+            voteChartInstance = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Total Votes',
+                        data: dataValues,
+                        backgroundColor: backgroundColors.slice(0, labels.length),
+                        borderColor: '#fff',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: { display: false },
+                        title: { 
+                            display: true, 
+                            text: 'Party-wise Vote Count', 
+                            font: { size: 16, weight: 'bold' },
+                            color: '#2d3748'
+                        }
+                    },
+                    scales: {
+                        y: { 
+                            beginAtZero: true, 
+                            title: { display: true, text: 'Number of Votes', color: '#4a5568' }, 
+                            ticks: { precision: 0, color: '#4a5568' } 
+                        },
+                        x: {
+                             ticks: { color: '#4a5568' } 
+                        }
+                    }
+                }
+            });
+        }
+        
+        // --- ADMIN FUNCTIONS ---
+
+        // Level 1 Credentials (for Voting Stats)
         const ADMIN_USERNAME = 'ECI@polling';
         const ADMIN_PASSWORD = 'ECI@2025';
+
+        // Level 2 Credentials (for Voter/Aadhaar Records)
+        const RECORDS_USERNAME = 'ECI@voting';
+        const RECORDS_PASSWORD = 'ECI@2025';
+
 
         function openAdminPanel() {
             document.getElementById('admin-modal').classList.add('active');
@@ -1240,6 +1194,7 @@
             }
         }
 
+        // Admin Dashboard - Page 1 (Voting Stats)
         function openAdminDashboard() {
             loadDatabaseToMemory();
             
@@ -1248,6 +1203,41 @@
             document.getElementById('admin-invalid-votes').textContent = invalidVotes;
             document.getElementById('admin-voter-ids').textContent = usedVoterIds.length;
             document.getElementById('admin-aadhaar-nums').textContent = usedAadhaarNums.length;
+            
+            renderVoteGraph();
+
+            document.getElementById('admin-dashboard-page1').classList.add('active');
+        }
+
+        function closeAdminDashboard() {
+            document.getElementById('admin-dashboard-page1').classList.remove('active');
+        }
+
+        // Admin Records - Level 2 Login
+        function openRecordsLogin() {
+            document.getElementById('admin-records-login-modal').classList.add('active');
+            document.getElementById('records-username').value = '';
+            document.getElementById('records-password').value = '';
+            document.getElementById('records-status').textContent = '';
+        }
+
+        function recordsLogin() {
+            const username = document.getElementById('records-username').value;
+            const password = document.getElementById('records-password').value;
+            
+            if (username === RECORDS_USERNAME && password === RECORDS_PASSWORD) {
+                document.getElementById('admin-records-login-modal').classList.remove('active');
+                openRecordsPage2();
+            } else {
+                const statusEl = document.getElementById('records-status');
+                statusEl.className = 'status error';
+                statusEl.textContent = '❌ Invalid credentials. Access denied.';
+            }
+        }
+
+        // Admin Records - Page 2 (Voter/Aadhaar Lists + DB ACTIONS)
+        function openRecordsPage2(fromLogin = true) {
+            loadDatabaseToMemory();
             
             // Display voter IDs
             const voterIdsList = document.getElementById('voter-ids-list');
@@ -1269,26 +1259,43 @@
                 ).join('');
             }
             
-            document.getElementById('admin-dashboard').classList.add('active');
-        }
-
-        function closeAdminDashboard() {
-            document.getElementById('admin-dashboard').classList.remove('active');
-        }
-
-        function refreshAdminDashboard() {
-            loadDatabaseToMemory();
-            openAdminDashboard();
+            // If coming from login, close Page 1
+            if (fromLogin) {
+                 document.getElementById('admin-dashboard-page1').classList.remove('active');
+            }
             
-            const statusEl = document.getElementById('admin-status');
+            document.getElementById('admin-records-page2').classList.add('active');
+        }
+
+        function closeRecordsPage2() {
+            document.getElementById('admin-records-page2').classList.remove('active');
+            document.getElementById('admin-dashboard-page1').classList.add('active'); // Go back to Page 1
+        }
+        
+        // REFRESH DATA (Updated to handle calls from Page 1 and Page 2)
+        function refreshAdminDashboard(isPage2 = false) { 
+            loadDatabaseToMemory();
+            
+            if (isPage2) {
+                 openRecordsPage2(false); 
+            } else {
+                 openAdminDashboard(false); 
+            }
+
+            // Provide feedback on the currently active status element
+            const statusId = isPage2 ? 'records-status' : 'admin-status';
+            const statusEl = document.getElementById(statusId);
+            
+            // Ensure the status element is visible by temporarily activating the parent modal if it's not active
             if (statusEl) {
                 statusEl.className = 'status success';
-                statusEl.textContent = '✅ Dashboard refreshed successfully!';
+                statusEl.textContent = '✅ Data refreshed successfully!';
                 setTimeout(() => {
                     if (statusEl) statusEl.textContent = '';
                 }, 2000);
             }
         }
+
 
         function exportDatabaseData() {
             const exportData = {
@@ -1300,7 +1307,8 @@
                     totalAttempts: totalAttempts
                 },
                 voterIds: usedVoterIds,
-                aadhaarNumbers: usedAadhaarNums.map(num => `********${num.slice(-4)}`),
+                // Mask sensitive data in the export, but keep it in the DB
+                aadhaarNumbers: usedAadhaarNums.map(num => `********${num.slice(-4)}`), 
                 partyVotes: partyVotes,
                 castVotes: castVotes.map(vote => ({
                     voterId: vote.voterId,
@@ -1329,14 +1337,12 @@
                 '• All ' + usedVoterIds.length + ' registered Voter IDs\n' +
                 '• All ' + usedAadhaarNums.length + ' registered Aadhaar numbers\n' +
                 '• All ' + castVotes.length + ' cast votes\n' +
-                '• All voting statistics\n' +
-                '• All party-wise vote counts\n\n' +
+                '• All voting statistics\n\n' +
                 'This action CANNOT BE UNDONE!\n\n' +
                 'Are you absolutely sure you want to proceed?');
             
             if (confirmation) {
                 const secondConfirmation = confirm('🔒 FINAL CONFIRMATION REQUIRED\n\n' +
-                    'Type your admin username in your mind: ECI@polling\n\n' +
                     'You are about to erase the entire voting database.\n' +
                     'This is your LAST CHANCE to cancel.\n\n' +
                     'Click OK to PERMANENTLY DELETE all data.\n' +
@@ -1345,14 +1351,19 @@
                 if (secondConfirmation) {
                     resetDatabase();
                     alert('✅ DATABASE RESET COMPLETE\n\n' +
-                        'All voting records have been permanently deleted.\n' +
-                        'The system is now ready for a new polling session.\n\n' +
-                        'Database Status: EMPTY');
-                    closeAdminDashboard();
+                        'All voting records have been permanently deleted.');
+                    
+                    // Close both admin panels
+                    document.getElementById('admin-records-page2').classList.remove('active');
+                    document.getElementById('admin-dashboard-page1').classList.remove('active');
+                    
+                    // Force refresh main dashboard data if they reopen it
+                    loadDatabaseToMemory(); 
                 }
             }
         }
 
+        // --- VOTING FLOW FUNCTIONS (Restored) ---
         function updatePartyResults() {
             const container = document.getElementById('party-results-container');
             container.innerHTML = '';
@@ -1413,7 +1424,7 @@
             }
 
             if (usedAadhaarNums.includes(aadhaar)) {
-                showStatus('❌ This Aadhaar number has already been used to cast a vote', 'error');
+                showStatus('❌ This Aadhaar number has already been used to cast a vote (Data link detected)', 'error');
                 return;
             }
 
@@ -1422,11 +1433,10 @@
                 currentVoterData = { voterId, aadhaar };
                 voterEligible = true;
                 
-                // --- START MODIFICATION: Store ID/Aadhaar in DB immediately upon successful verification ---
+                // Store ID/Aadhaar in DB immediately upon successful verification
                 usedVoterIds.push(voterId);
                 usedAadhaarNums.push(aadhaar);
                 saveToDatabase();
-                // --- END MODIFICATION ---
                 
                 setTimeout(() => {
                     openBallotPage();
@@ -1505,7 +1515,6 @@
             let remaining = seconds;
             const countdownEl = document.getElementById('countdown');
             
-            // Clear any existing timer
             if (countdownTimer) {
                 clearTimeout(countdownTimer);
             }
@@ -1529,7 +1538,6 @@
             let remaining = seconds;
             const countdownEl = document.getElementById('stats-countdown');
             
-            // Clear any existing timer
             if (countdownTimer) {
                 clearTimeout(countdownTimer);
             }
@@ -1561,10 +1569,8 @@
             
             totalAttempts++;
             
-            // --- MODIFICATION: Duplicate checks are now handled and persisted in verifyVoter() ---
+            // Check if the voter ID was correctly registered and not used before the vote
             if (!usedVoterIds.includes(voterId)) {
-                // Safety check: if ID is not in used list (meaning user cleared localStorage 
-                // between verify and cast, or other error), mark as invalid
                 invalidVotes++;
                 saveToDatabase();
                 showStatus('❌ Invalid: Verification state lost. Please re-verify before voting.', 'error', 'ballot-status');
@@ -1574,14 +1580,11 @@
                 });
                 return;
             }
-            // --- END MODIFICATION ---
             
             showStatus('Processing your vote...', 'info', 'ballot-status');
             
             setTimeout(() => {
                 const confirmationId = 'CONF-' + Math.random().toString(36).substr(2, 9).toUpperCase();
-                
-                // ID/Aadhaar are no longer pushed here as they were already done and persisted in verifyVoter()
                 
                 validVotes++;
                 partyVotes[selectedParty]++;
@@ -1593,7 +1596,7 @@
                     timestamp: new Date().toISOString() 
                 });
                 
-                saveToDatabase(); // Save the vote data and updated counts
+                saveToDatabase();
                 
                 showStatus(`✅ Vote cast successfully! Confirmation ID: ${confirmationId}`, 'success', 'ballot-status');
                 
@@ -1619,6 +1622,7 @@
             document.getElementById('upload-voter-id').value = '';
         }
 
+        // --- CHAT FUNCTIONS (Restored) ---
         function sendChat() {
             const text = document.getElementById('chat-text').value.trim();
             if (!text) return;
@@ -1647,60 +1651,49 @@
         function getBotReply(message) {
             const s = message.toLowerCase();
             
-            // 1. What documents do I need to bring to the polling station to cast my vote?
             if (s.includes('document') || s.includes('aadhaar') || s.includes('proof') || s.includes('id')) {
                 return 'As per ECI rules, you must bring your Voter ID (EPIC) to the polling station. Aadhaar is used for enhanced verification in this demo. Ensure your documents are valid.';
             }
 
-            // 2. What is the step-by-step process for casting my vote on the Electronic Voting Machine (EVM)?
             if (s.includes('how') || s.includes('vote') || s.includes('process')) {
                 return 'Per ECI guidelines: 1) Verify your ID and get your finger marked with indelible ink. 2) Proceed to the EVM and select your party by pressing the blue button next to the party\'s symbol and name. Your vote is then securely recorded.';
             }
 
-            // 3. Am I eligible to vote, and where can I confirm my registration status?
             if (s.includes('eligible') || s.includes('age') || s.includes('register')) {
                 return 'ECI rules state you must be 18+ years old, a citizen of India, and registered on the electoral roll. You can confirm your status and apply for registration online via the official ECI website.';
             }
             
-            // 4. How is the secrecy of my vote maintained, and can anyone find out who I voted for?
             if (s.includes('secrecy') || s.includes('anonymous') || s.includes('confidential')) {
                 return 'ECI strictly ensures voter secrecy. Your vote is confidential, and its choice cannot be disclosed or coerced by anyone. Protecting your democratic right is paramount.';
             }
             
-            // 5. What should I do if I witness any irregularities, malpractice, or issues at the polling booth?
             if (s.includes('irregularit') || s.includes('complaint') || s.includes('report')) {
                 return 'If you witness any irregularities (e.g., booth capturing, malpractice, fake votes), you must report immediately to the presiding polling officers or the ECI helpline. Your action maintains election integrity.';
             }
             
-            // 6. Can I cast a duplicate vote, or what happens if I try to vote twice?
             if (s.includes('duplicate') || s.includes('twice')) {
                 return 'As per ECI rules, duplicate voting is strictly prohibited and is a punishable offense. Our system utilizes a secure database to prevent any voter from casting multiple votes using the same Voter ID or Aadhaar number.';
             }
 
-            // 7. Are there any restrictions on campaigning or behavior near the polling booth?
             if (s.includes('campaign') || s.includes('code of conduct') || s.includes('restriction')) {
                 return 'ECI\'s Model Code of Conduct prohibits campaigning, displaying party material, or using inducements within 100 meters of the polling station. Please maintain peace and order.';
             }
             
-            // 8. Why is my vote important, and what impact does my participation have?
             if (s.includes('importance') || s.includes('why') || s.includes('impact')) {
                 return 'Voting is the foundation of democracy. It is your right and responsibility to elect your representatives. Your participation shapes the future, and abstaining weakens your influence.';
             }
 
-            // 9. How do I identify my party on the ballot, and what do the symbols mean?
             if (s.includes('party') || s.includes('symbol') || s.includes('ballot') || s.includes('identify')) {
-                // --- FIX: Updated examples to reflect new symbols ---\
                 return 'The ballot lists parties with their reserved symbols as per ECI allocations (e.g., BJP - 🪷, INC - ✋). Symbols are crucial for accessibility. You identify your party by its name and symbol on the EVM.';
             }
 
-            // 10. What are the general rules and core principles the Election Commission of India (ECI) follows for elections?
             if (s.includes('eci') || s.includes('rules') || s.includes('election') || s.includes('principles')) {
                 return 'The ECI ensures free, fair, and transparent elections based on key principles: Universal adult suffrage, a secret ballot, non-discrimination, and adherence to the Model Code of Conduct.';
             }
             
-            // Initial/Fallback message
             return 'I provide ECI-compliant guidance on voting, eligibility, documents, symbols, and election awareness. Ask me about any aspect of the voting process!';
         }
+
 
         // Initialize on page load
         updateChat();
